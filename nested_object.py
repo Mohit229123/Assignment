@@ -1,22 +1,33 @@
-def functiontest(dictionary,key_list):
-    if len(dictionary) == 0:
-        print('Dictionary is empty')
-    if len(key_list) == 0:
-        print("Invalid Key Supplied")
-    key_to_search = key_list[0]
-    if key_to_search in dictionary.keys():
-        value_found = dictionary[key_to_search]
-        if type(value_found) is dict:
-            functiontest(value_found, key_list[1:])
-        elif len(key_list) == 1:
-            print(value_found)
-        else:
-            print (f"Invalid key {key_list}")
+# We have a nested object, we would like a function that you pass in the object and a key and get back the value. How this is implemented is up to you.
+# Example Inputs
+# object = {“a”:{“b”:{“c”:”d”}}}
+# key = a/b/c
+# object = {“x”:{“y”:{“z”:”a”}}}
+# key = x/y/z
+# value = a
+
+def getKey(obj: dict):
+    keys = list(obj)
+    if len(keys) != 1:
+        raise Exception('either multiple keys or empty dict found')
     else:
-        print(f"Key {key_to_search} not found in dictionary {dictionary}")
- 
-if __name__=='__main__':
-    sample_dict = {"x":{"y":{"z":"a"},"p":{"q":"r"}, "j" : "t"}, "d":{"g":{"s":"p"}}}
- 
-    key_value = ["x", "y", "z"]
-    functiontest(sample_dict, key_value)
+        return keys[0]
+
+def getNestedValue(obj: dict, key: str, isFound = False):
+    # print(obj, key, isFound)
+    if type(obj) is not dict and not isFound:
+        return None
+    if (isFound or (key in obj.keys())) :
+        if type(obj[key]) is dict:
+            return getNestedValue(obj[key], getKey(obj[key]), True)
+        else:
+            # print(f'obj[getKey(obj)]: {obj[getKey(obj)]}')
+            return obj[getKey(obj)]
+    else:
+        nestedKey = getKey(obj)
+        return getNestedValue(obj[nestedKey], key, False)
+
+if __name__ == '__main__':
+    obj = {'a': {'b': {'c': 'd'}}}
+    value = getNestedValue(obj, 'c')
+    print(value)
