@@ -1,3 +1,5 @@
+# ASG for web 
+
 resource "aws_launch_template" "web" {
   name_prefix   = "web-lt-"
   image_id      = "ami-007855ac798b5175e" 
@@ -41,6 +43,8 @@ resource "aws_autoscaling_group" "web" {
     create_before_destroy = true
   }
 }
+
+# ASG for app 
 
 resource "aws_launch_template" "app" {
   name_prefix   = "app-lt-"
@@ -87,6 +91,8 @@ resource "aws_autoscaling_group" "app" {
   }
 }
 
+# ALB for web
+
 resource "aws_lb" "web" {
   name               = "web-alb"
   internal           = false
@@ -117,6 +123,8 @@ resource "aws_lb_listener" "web" {
     target_group_arn = aws_lb_target_group.web.arn
   }
 }
+
+# ALB for app
 
 resource "aws_lb" "app" {
   name               = "app-alb"
