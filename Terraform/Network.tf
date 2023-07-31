@@ -1,81 +1,81 @@
-# Main VPC
-resource "aws_vpc" "main" {
-  cidr_block = var.main_cidr_block
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
 
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  name = "main"
+  cidr = var.vpc_cidr
+
+  azs              = ["${var.aws_region}a", "${var.aws_region}b"]
+  public_subnets   = var.public_subnets
+  private_subnets  = var.private_subnets
+  database_subnets = var.database_subnets
+
+  enable_nat_gateway = true
+  enable_vpn_gateway = false
+
+  public_subnet_names   = ["web-subnet-1", "web-subnet-2"]
+  private_subnet_names  = ["app-subnet-1", "app-subnet-2"]
+  database_subnet_names = ["db-subnet-1", "db-subnet-2"]
+
   tags = {
-    Name = "main"
+    Terraform   = "true"
+    Environment = "dev"
   }
 }
 
-# Public Subnet
-resource "aws_subnet" "public_subnets" {
-  count                   = length(var.public_cidr_blocks)
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_cidr_blocks[count.index]
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "public_subnet_${count.index + 1}"
-  }
+resource "aws_security_group" "web" {
+  name        = "web"
+  description = "Allow inbound traffic for web tier"
+  vpc_id      = module.vpc.vpc_id
 }
 
-#Internet Gateway
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
+resource "aws_security_group_rule" "web" {
+  security_group_id = aws_security_group.web.id
 
-  tags = {
-    Name = "main"
-  }
+  type        = "ingress"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
-# Route table
-resource "aws_route_table" "public_route" {
-  vpc_id = aws_vpc.main.id
+resource "aws_security_group_rule" "web_ssh" {
+  security_group_id = aws_security_group.web.id
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
-  }
-
-  tags = {
-    Name = "public_route"
-  }
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"] # Replace with your desired CIDR blocks for SSH access
 }
 
-# Route table associations
-resource "aws_route_table_association" "public_route_association" {
-  count          = length(var.public_cidr_blocks)
-  subnet_id      = aws_subnet.public_subnets[count.index].id
-  route_table_id = aws_route_table.public_route.id
+resource "aws_security_group" "app" {
+  name        = "app"
+  description = "Allow inbound traffic for app tier"
+  vpc_id      = module.vpc.vpc_id
 }
 
-# Security group
-resource "aws_security_group" "main_sg" {
-  name        = "allow_connection"
-  description = "Allow HTTP"
-  vpc_id      = aws_vpc.main.id
+resource "aws_security_group_rule" "app" {
+  security_group_id = aws_security_group.app.id
 
-  ingress {
-    description      = "HTTP from anywhere"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+  type        = "ingress"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+}
 
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+resource "aws_security_group" "db" {
+  name        = "db"
+  description = "Allow inbound traffic for db tier"
+  vpc_id      = module.vpc.vpc_id
+}
 
-  tags = {
-    Name = "allow_http"
-  }
+resource "aws_security_group_rule" "db" {
+  security_group_id = aws_security_group.db.id
+
+  type        = "ingress"
+  from_port   = 3306
+  to_port     = 3306
+  protocol    = "tcp"
+  cidr_blocks = ["10.0.3.0/24", "10.0.4.0/24"]
 }
