@@ -1,3 +1,5 @@
+#Network DB
+
 resource "aws_db_subnet_group" "db" {
   name       = "db"
   subnet_ids = module.vpc.database_subnets
@@ -30,6 +32,8 @@ resource "aws_security_group_rule" "rds" {
   cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
+#DB instance
+
 resource "aws_db_instance" "main" {
   allocated_storage      = 20
   storage_type           = "gp2"
@@ -42,9 +46,8 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = aws_db_subnet_group.db.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
-  multi_az = false # change to true to enable multi-az
+  multi_az = true
 
-  # To ensure the primary instance is in us-east-1a, specify its availability zone
   availability_zone = "us-east-1a"
 
   backup_retention_period = 7
