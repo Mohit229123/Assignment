@@ -22,6 +22,8 @@ module "vpc" {
   }
 }
 
+#SG for web
+
 resource "aws_security_group" "web" {
   name        = "web"
   description = "Allow inbound traffic for web tier"
@@ -48,6 +50,8 @@ resource "aws_security_group_rule" "web_ssh" {
   cidr_blocks = ["0.0.0.0/0"] 
 }
 
+#SG for app
+
 resource "aws_security_group" "app" {
   name        = "app"
   description = "Allow inbound traffic for app tier"
@@ -63,6 +67,8 @@ resource "aws_security_group_rule" "app" {
   protocol    = "tcp"
   cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
 }
+
+#SG for db
 
 resource "aws_security_group" "db" {
   name        = "db"
