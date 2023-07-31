@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "web_ssh" {
   from_port   = 22
   to_port     = 22
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"] # Replace with your desired CIDR blocks for SSH access
+  cidr_blocks = ["0.0.0.0/0"] 
 }
 
 resource "aws_security_group" "app" {
