@@ -1,11 +1,9 @@
 resource "aws_launch_template" "web" {
   name_prefix   = "web-lt-"
-  image_id      = "ami-007855ac798b5175e" # AMI ID for Ubuntu 22.04; replace it with the appropriate AMI ID for your use case
-  instance_type = var.web_instance_type   #change instance size to your specifications in .tfvars file, such as M5 General
+  image_id      = "ami-007855ac798b5175e" 
+  instance_type = var.web_instance_type   
 
   vpc_security_group_ids = [aws_security_group.web.id]
-
-  user_data = base64encode(templatefile("${path.module}/userdata_web.tpl", {}))
 
   lifecycle {
     create_before_destroy = true
@@ -46,12 +44,10 @@ resource "aws_autoscaling_group" "web" {
 
 resource "aws_launch_template" "app" {
   name_prefix   = "app-lt-"
-  image_id      = "ami-007855ac798b5175e" # AMI ID for Ubuntu 22.04; replace it with the appropriate AMI ID for your use case
-  instance_type = var.web_instance_type   #change instance size to your specifications in .tfvars file, such as M5 General
+  image_id      = "ami-007855ac798b5175e" 
+  instance_type = var.web_instance_type   
 
   vpc_security_group_ids = [aws_security_group.web.id]
-
-  user_data = base64encode(templatefile("${path.module}/userdata_app.tpl", {}))
 
   lifecycle {
     create_before_destroy = true
