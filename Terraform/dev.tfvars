@@ -12,3 +12,4 @@ app_instance_type = "t2.micro"
 db_instance_class = "db.t2.micro"
 db_username       = "admin"
 db_password       = "password"
+multi_az          = false
