@@ -21,7 +21,7 @@ get_specific_metadata_key() {
 }
 
 if [ -n "$1" ]; then
-  data_key=$1
+  key=$1
   get_specific_metadata_key "${data_key}"
 else
   get_instance_metadata
