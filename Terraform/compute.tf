@@ -35,7 +35,7 @@ resource "aws_autoscaling_group" "web" {
 
   tag {
     key                 = "Environment"
-    value               = "dev"
+    value               = var.environment
     propagate_at_launch = true
   }
 
@@ -82,7 +82,7 @@ resource "aws_autoscaling_group" "app" {
 
   tag {
     key                 = "Environment"
-    value               = "dev"
+    value               = var.environment
     propagate_at_launch = true
   }
 
@@ -102,7 +102,7 @@ resource "aws_lb" "web" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = var.environment
   }
 }
 
@@ -135,7 +135,7 @@ resource "aws_lb" "app" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = var.environment
   }
 }
 
