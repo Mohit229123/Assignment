@@ -7,7 +7,7 @@ resource "aws_db_subnet_group" "db" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = var.environment
   }
 }
 
@@ -18,7 +18,7 @@ resource "aws_security_group" "rds" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = var.environment
   }
 }
 
@@ -55,6 +55,6 @@ resource "aws_db_instance" "main" {
 
   tags = {
     Terraform   = "true"
-    Environment = "dev"
+    Environment = var.environment
   }
 }
